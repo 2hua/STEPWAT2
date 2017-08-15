@@ -225,6 +225,7 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 	 * on its relative size, its root distribution, and
 	 * its phenology (activity).
 	 */
+  RealF use_by_group_NEW[MAX_RGROUPS]; // copy of input array to output different results side by side
 
 	GrpIndex g;
 	SppIndex s;
@@ -238,6 +239,10 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 	RealD avgMaxBioByGroup[MAX_RGROUPS] = {0.};
 	RealD fracGroupsMaxBioFromType = 0;
 
+  // values for refactored equation
+  RealD avgCritByGroup[MAX_RGROUPS] = {0.};
+  RealD refactoredCrit = 0;
+
   ForEachGroup(g)
 	{
 		t = RGroup[g]->veg_prod_type-1;
@@ -245,6 +250,8 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 			if(Species[s]->use_me)
 				avgMaxBioByGroup[g] += Species[s]->mature_biomass;
 		}
+    avgCritByGroup[t] += RGroup[g]->min_res_req; // get the critical value sums
+
 		avgMaxBioByGroup[g] /= RGroup[g]->max_spp;
 		sumMaxBioByType[t] += avgMaxBioByGroup[g];
 	}
@@ -252,6 +259,7 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 	ForEachGroup(g)
 	{
 		use_by_group[g] = 0.; /* clear */
+    use_by_group_NEW[g] = 0;
 		t = RGroup[g]->veg_prod_type-1;
 
     fracGroupsMaxBioFromType = avgMaxBioByGroup[g]/sumMaxBioByType[t];
@@ -259,29 +267,32 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 		switch(t) {
 		case 0://Tree
 			transp = SXW.transpTrees;
+      refactoredCrit = RGroup[g]->min_res_req / avgCritByGroup[t];
 			break;
 		case 1://Shrub
 			transp = SXW.transpShrubs;
+      refactoredCrit = RGroup[g]->min_res_req / avgCritByGroup[t];
 			break;
 		case 2://Grass
 			transp = SXW.transpGrasses;
+      refactoredCrit = RGroup[g]->min_res_req / avgCritByGroup[t];
 			break;
 		case 3://Forb
 			transp = SXW.transpForbs;
+      refactoredCrit = RGroup[g]->min_res_req / avgCritByGroup[t];
 			break;
 		default:
 			transp = SXW.transpTotal;
+      refactoredCrit = RGroup[g]->min_res_req / avgCritByGroup[t];
 			break;
 		}
 		ForEachTrPeriod(p)
 		{
-      // TODO: compare fracGroupsMaxBioFromType results with newly partioned results
 			int nLyrs = getNTranspLayers(RGroup[g]->veg_prod_type);
 			for (l = 0; l < nLyrs; l++) {
-				use_by_group[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * RGroup[g]->min_res_req * transp[Ilp(l, p)]); // ORIGINAL
-        //use_by_group[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * fracGroupsMaxBioFromType * transp[Ilp(l, p)]); // OLD COMMIT (ONE TO COMPARE)
-        //use_by_group[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * newPartionedResources * transp[Ilp(l, p)]); // NEW VERSION WITH RESOURCE PARTIONED
-				//printf("for groupName= %s, layerIndex: %d  after sum use_by_group[g]= %f \n",RGroup[g]->name,l,use_by_group[g] );
+        use_by_group[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * fracGroupsMaxBioFromType * transp[Ilp(l, p)]); // OLD COMMIT (ONE TO COMPARE)
+        use_by_group_NEW[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * refactoredCrit * transp[Ilp(l, p)]); // NEW VERSION WITH RESOURCE PARTIONED
+				printf("for groupName= %s, layerIndex: %d  use_by_group[g]= %f | use_by_group_NEW= %f\n",RGroup[g]->name,l,use_by_group[g],use_by_group_NEW[g]);
 			}
 		}
 		sumUsedByGroup += use_by_group[g];
