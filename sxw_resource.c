@@ -225,8 +225,6 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 	 * on its relative size, its root distribution, and
 	 * its phenology (activity).
 	 */
-  RealF use_by_group_NEW[MAX_RGROUPS]; // copy of input array to output different results side by side
-
 	GrpIndex g;
 	SppIndex s;
 	TimeInt p;
@@ -235,10 +233,6 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 	RealD *transp;
 	RealF sumUsedByGroup = 0., sumTranspTotal = 0., TranspRemaining = 0.;
 
-  RealD sumMaxBioByType[4] = {0.};
-	RealD avgMaxBioByGroup[MAX_RGROUPS] = {0.};
-	RealD fracGroupsMaxBioFromType = 0;
-
   // values for refactored equation
   RealD avgCritByGroup[MAX_RGROUPS] = {0.};
   RealD refactoredCrit = 0;
@@ -246,23 +240,13 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
   ForEachGroup(g)
 	{
 		t = RGroup[g]->veg_prod_type-1;
-		ForEachGroupSpp(s,g,i) {
-			if(Species[s]->use_me)
-				avgMaxBioByGroup[g] += Species[s]->mature_biomass;
-		}
     avgCritByGroup[t] += RGroup[g]->min_res_req; // get the critical value sums
-
-		avgMaxBioByGroup[g] /= RGroup[g]->max_spp;
-		sumMaxBioByType[t] += avgMaxBioByGroup[g];
 	}
 
 	ForEachGroup(g)
 	{
 		use_by_group[g] = 0.; /* clear */
-    use_by_group_NEW[g] = 0;
 		t = RGroup[g]->veg_prod_type-1;
-
-    fracGroupsMaxBioFromType = avgMaxBioByGroup[g]/sumMaxBioByType[t];
 
 		switch(t) {
 		case 0://Tree
@@ -290,13 +274,13 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 		{
 			int nLyrs = getNTranspLayers(RGroup[g]->veg_prod_type);
 			for (l = 0; l < nLyrs; l++) {
-        use_by_group[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * fracGroupsMaxBioFromType * transp[Ilp(l, p)]); // OLD COMMIT (ONE TO COMPARE)
-        use_by_group_NEW[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * refactoredCrit * transp[Ilp(l, p)]); // NEW VERSION WITH RESOURCE PARTIONED
-				printf("for groupName= %s, layerIndex: %d  use_by_group[g]= %f | use_by_group_NEW= %f\n",RGroup[g]->name,l,use_by_group[g],use_by_group_NEW[g]);
+        use_by_group[g] += (RealF) (_roots_active_rel[Iglp(g, l, p)] * refactoredCrit * transp[Ilp(l, p)]); // NEW VERSION WITH RESOURCE PARTIONED
+				printf("for groupName= %s, layerIndex: %d  use_by_group[g]= %f\n",RGroup[g]->name,l,use_by_group[g]);
 			}
 		}
 		sumUsedByGroup += use_by_group[g];
 	}
+
 	//Occasionally, extra transpiration remains and if not perfectly partitioned to RGroups.
 	//This check makes sure any remaining transpiration is divided proportionately among Rgroups.
 	ForEachTrPeriod(p)
@@ -310,7 +294,6 @@ static void _transp_contribution_by_group(RealF use_by_group[]) {
 		{
 			if(!ZRO(use_by_group[g])) {
                 use_by_group[g] += (use_by_group[g]/sumUsedByGroup) * TranspRemaining;
-              //  printf("for groupName= %s, after sum use_by_group[g]= %f \n",RGroup[g]->name,use_by_group[g] );
 		}
 	}
 }
