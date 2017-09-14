@@ -321,8 +321,8 @@ void Species_Update_Newsize(SppIndex sp, RealF newsize)
 	if (Species[sp]->est_count < 0)
 		Species[sp]->est_count = 0;
 	//}
-	if (ZERO(Species[sp]->relsize))
-		Species[sp]->relsize = 0.0;
+	//if (ZERO(Species[sp]->relsize))
+//		Species[sp]->relsize = 0.0;
 
 #undef xF_DELTA
 #undef xD_DELTA
