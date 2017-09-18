@@ -53,7 +53,7 @@ static RealF _ppt2resource(RealF ppt, GroupType *g);
 static void _res_part_extra(Bool isextra, RealF extra, RealF size[]);
 static GroupType *_create(void);
 static void _extra_growth(GrpIndex rg);
-static void _add_annual_seedprod(SppIndex sp, RealF pr);
+static void _add_annual_seedprod(SppIndex sp, RealF lastyear_relsize);
 static RealF _get_annual_maxestab(SppIndex sp);
 static RealF _add_annuals(const GrpIndex rg, const SppIndex sp, const RealF lastyear_relsize);
 
