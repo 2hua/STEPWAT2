@@ -204,7 +204,7 @@ void mort_EndOfYear( void)
          
          if (x_cheatgrass < 0.35)
                      {
-                        y = 1 / Globals.runModelYears ;
+                        y = 0 ;
                     }
                      
                      else{
