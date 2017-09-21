@@ -283,16 +283,18 @@ static void _add_annual_seedprod(SppIndex sp, RealF lastyear_relsize) {
 
     SpeciesType *s = Species[sp];
     IntU i;
+    RealF j;
 
 
     //incrementing the number of viable years
-    for (i = s->viable_yrs - 1; i > 0; i--) {
+    for (i = s->viable_yrs - 1; i > 0; i--)
+    {
         if (i == 1 || i == 2) {
-            //printf("Species name=%s , old Array values for index i=%u, value=%hu \n", s->name, i, s->seedprod[i]);
-        }
+            printf("Species name=%s , old Array values for index i=%u, value=%hu \n", s->name, i, s->seedprod[i]);
+   //     }
 
         s->seedprod[i] = s->seedprod[i - 1];
-    }
+     }
 
     //printf("Species name=%s ,old Array array 0 index i=%u, value =%hu \n", s->name, i, s->seedprod[i]);
 
@@ -301,10 +303,16 @@ static void _add_annual_seedprod(SppIndex sp, RealF lastyear_relsize) {
     //number of seedlings that can establish and last year's species relative size.
     if (Globals.currYear == 1) {
         s->seedprod[i] = RandUniRange(1, s->max_seed_estab);
-        printf("Species name=%s ,currYear =1 so new calculated value s->seedprod[%d]= %.5f , s->max_seed_estab =%d\n", s->name, i, s->seedprod[i], s->max_seed_estab);
+       // printf("Species name=%s ,currYear =1 so new calculated value s->seedprod[%d]= %d , s->max_seed_estab =%d\n", s->name, i, s->seedprod[i], s->max_seed_estab);
     } else {
-        s->seedprod[i] = (IntU)& s->max_seed_estab * s->lastyear_relsize;
-        printf("Species name=%s ,currYear=%d  so new calculated value s->seedprod[%d]= %.5f , s->max_seed_estab =%d, lastyear_relsize=%.5f\n", s->name, Globals.currYear, i, s->seedprod[i], s->max_seed_estab, lastyear_relsize);
+
+                j = (s->max_seed_estab) * (s->lastyear_relsize);
+ //                printf("Species name=%s ,currYear=%d, s->max_seed_estab =%d, lastyear_relsize=%.5f\n", s->name, Globals.currYear, i, s->max_seed_estab, s->lastyear_relsize);
+   
+                s->seedprod[i] = (IntU)& j;
+                
+        //printf("Species name=%s ,currYear=%d  so new calculated value s->seedprod[%d]= %d , s->max_seed_estab =%d, lastyear_relsize=%.5f\n", s->name, Globals.currYear, i, s->seedprod[i], s->max_seed_estab, s->lastyear_relsize);
+     }
     }
 }
 
