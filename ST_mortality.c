@@ -212,7 +212,7 @@ void mort_EndOfYear( void)
                          }
          if (LT(y, g->killfreq)) // If prescribed fire possibility 0 > g->killfreq >1, the fire will happen based on both fire. If prescribed fire possibility g->killfreq >1, only prescribed fire happen. 
              y = g->killfreq;
-         printf("[Rui] x_firefrequency: %f\n",y);
+       //  printf("[Rui] x_firefrequency: %f\n",y);
 	ForEachGroup(rg)
 	{
 		if (Globals.currYear < RGroup[rg]->startyr)
@@ -231,7 +231,7 @@ void mort_EndOfYear( void)
 				if (RandUni() <= y)
 				{
 					g->killyr = Globals.currYear;
-                                        printf("[Rui]WildFire.currYear: %d\n",Globals.currYear);
+                                       // printf("[Rui]WildFire.currYear: %hu\n",Globals.currYear);
                                        
 				}
 
@@ -239,7 +239,10 @@ void mort_EndOfYear( void)
 			else if (((Globals.currYear - g->killfreq_startyr) % (IntU) y) == 0)
 			{
 				g->killyr = Globals.currYear;
-                                printf("[Rui]ManagementFire.currYear: %d\n",Globals.currYear);
+                               printf("[Rui]ManagementFire.currYear: %hu\n",Globals.currYear);
+                                printf("[Rui]P.cool.grass: %s\n",RGroup[6]->name);
+                                 printf("[Rui]P.cool.grass: %f\n",RGroup[6]->relsize);
+                                
 			}
                          
 
@@ -363,7 +366,7 @@ void proportion_Recovery(void)
 
 		//rgroup proportion recovery
 		if (Globals.currYear == RGroup[rg]->killyr)
-                    printf("[Rui]WildFire.recovery: %d\n",Globals.currYear);
+                 //   printf("[Rui]WildFire.recovery: %d\n",Globals.currYear);
 		{
 			Int i;
 			ForEachEstSpp2( rg, i)
