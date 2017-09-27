@@ -196,21 +196,21 @@ void mort_EndOfYear( void)
 	//printf("inside mort_EndOfYear() \n");
 	GrpIndex rg;
 	GroupType *g;
-        RealF y = 0.;
-        IntS cg_idx = 9;
+        RealF y = 0.;// Set a new fire possibility y
+        IntS cg_idx = 9; //Cheatgrass index number
         RealF x_cheatgrass = Species[cg_idx]->relsize * Species[cg_idx]->mature_biomass; // calculate biomass of cheatgrass
         
          //printf("[Rui] x_cheatgrass: %f\n",x_cheatgrass);
          
-         if (x_cheatgrass < 0.35)
+         if (x_cheatgrass < 0.35) // If cheatgrass biomass < 0.35g, the wild fire does not happen 
                      {
                         y = 0 ;
                     }
                      
                      else{
-                         y =- 0.117 + 0.0093 * x_cheatgrass;
+                         y =- 0.117 + 0.0093 * x_cheatgrass;// If cheatgrass biomass > 0.35g, the wild fire happen based on a linear model of cheatgrass biomass
                          }
-         if (LT(y, g->killfreq))
+         if (LT(y, g->killfreq)) // If prescribed fire possibility 0 > g->killfreq >1, the fire will happen based on both fire. If prescribed fire possibility g->killfreq >1, only prescribed fire happen. 
              y = g->killfreq;
          printf("[Rui] x_firefrequency: %f\n",y);
 	ForEachGroup(rg)
