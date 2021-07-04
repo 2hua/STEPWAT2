@@ -1197,6 +1197,8 @@ static void _species_init( void) {
        viable;
    RealF irate, ratep, estab, minb, maxb, cohort, xdecay,
          p1, p2, p3, p4, p5, p6, p7;
+   float var;
+
 
    char clonal[5];
 
@@ -1211,10 +1213,10 @@ static void _species_init( void) {
       }
 
 		x = sscanf(inbuf,
-				"%s %hd %hd %f %f %hd %hd %f %hd %f %f %s %hd %hd %f %hd",
+				"%s %hd %hd %f %f %hd %hd %f %hd %f %f %s %hd %hd %f %hd %f",
 				name, &rg, &age, &irate, &ratep, &slow, &dist, &estab, &eind,
-				&minb, &maxb, clonal, &vegi, &temp, &cohort, &turnon);
-      if (x != 16) {
+				&minb, &maxb, clonal, &vegi, &temp, &cohort, &turnon, &var);
+      if (x != 17) {
         LogError(logfp, LOGFATAL, "%s: Wrong number of columns in species",
                 MyFileName);
       }
@@ -1258,6 +1260,7 @@ static void _species_init( void) {
       Species[sp]->use_me = (RGroup[rg-1]->use_me) ? itob(turnon) : FALSE ;
       Species[sp]->received_prob = 0;
       Species[sp]->cohort_surv = cohort;
+      Species[sp]->var = var;
 /*      Species[sp]->ann_mort_prob = (age > 0)
                                  ? -log(cohort)/age
                                  : 0.0;
@@ -1299,7 +1302,7 @@ static void _species_init( void) {
 
      Species[sp]->viable_yrs = viable;
      Species[sp]->exp_decay  = xdecay;
-     Species[sp]->seedprod = (RealF *) Mem_Calloc( viable, sizeof(RealF), "species_init()");
+     Species[sp]->seedprod = (IntU *) Mem_Calloc( viable, sizeof(IntU), "species_init()");
 
    } /* end while readspp*/
 
